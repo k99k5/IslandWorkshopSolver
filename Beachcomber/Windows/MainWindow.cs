@@ -98,7 +98,7 @@ public class MainWindow : Window, IDisposable
         catch (Exception e)
         {
             PluginLog.LogError(e, "Error opening window and writing supply/initing");
-            DalamudPlugins.Chat.PrintError("Error opening window. See /xllog for more info.");
+            DalamudPlugins.Chat.PrintError("打开窗口错误。/xllog 查看更多信息");
             IsOpen = false;
         }
     }
@@ -157,9 +157,13 @@ public class MainWindow : Window, IDisposable
     {
         if(showSupplyError)
         {
-            ImGui.TextColored(red, "Can't import supply!! \nPlease talk to the Tactful Taskmaster on your Island Sanctuary, \nopen the Supply/Demand window, then hit this button.");
+            ImGui.TextColored(red,
+                "不能导入供应信息！ \n" +
+                "请在无人岛与监工小员谈话， \n" +
+                "打开“工坊生产计划”，然后点击按钮重试。"
+            );
             ImGui.Spacing();
-            if (ImGui.Button("Reimport Supply"))
+            if (ImGui.Button("重试"))
             {
                 OnOpen();
             }
@@ -167,7 +171,7 @@ public class MainWindow : Window, IDisposable
         }
         if(showWorkshopError)
         {
-            ImGui.TextColored(yellow, "Warning: You have a workshop ready to upgrade that has not been confirmed. Please examine all your workshop placards and keep an eye out for excited mammets.");
+            ImGui.TextColored(yellow, "警告：你有一个准备升级的开拓工房没有确认。请检查所有的管理板");
             ImGui.Spacing();
         }
         try
@@ -175,7 +179,7 @@ public class MainWindow : Window, IDisposable
 
             endDaySummaries = Solver.Solver.Importer.endDays;
             float buttonWidth = ImGui.GetContentRegionAvail().X / 6;
-            if (ImGui.Button("Run Solver", new Vector2(buttonWidth, 0f)))
+            if (ImGui.Button("求解", new Vector2(buttonWidth, 0f)))
             {                
                 try
                 {
@@ -201,15 +205,15 @@ public class MainWindow : Window, IDisposable
                 }
             }
             ImGui.SameLine(buttonWidth+20);
-            string totalCowries = "Total cowries this season: " + Solver.Solver.TotalGross;
+            string totalCowries = "本周期销售额: " + Solver.Solver.TotalGross;
             if (config.showNetCowries)
-                totalCowries += " (" + Solver.Solver.TotalNet + " net)";
+                totalCowries += " (" + Solver.Solver.TotalNet + " 净利润)";
             ImGui.Text(totalCowries);
 
             ImGui.GetContentRegionAvail();
             
             ImGui.SameLine(ImGui.GetContentRegionAvail().X - buttonWidth + 10);
-            if (ImGui.Button("Config", new Vector2(buttonWidth,0f)))
+            if (ImGui.Button("设置", new Vector2(buttonWidth,0f)))
             {
                 Plugin.DrawConfigUI();
             }
@@ -217,16 +221,16 @@ public class MainWindow : Window, IDisposable
 
             if(showInventoryError)
             {
-                ImGui.TextColored(red, "Inventory uninitialized. Open your Isleventory and view all tabs");
-                ImGui.TextColored(red, "or turn off \"Must have rare materials\" in configs.");
+                ImGui.TextColored(red, "库存还没有初始化。打开你的开拓包，并点击所有的标签。");
+                ImGui.TextColored(red, "或者在设置中关闭 \"必须有稀有材料\"。");
                 ImGui.Spacing();
             }
 
             if (scheduleSuggestions.Count > 1 && config.day > 0)
             {
-                ImGui.TextColored(yellow, "There are suggestions for multiple days available!");
+                ImGui.TextColored(yellow, "有多日的建议可供选择！");
                 ImGui.Spacing();
-                ImGui.TextWrapped("These schedules affect each other! Select the highest-value schedules first to get better recommendations for the worse day(s).");
+                ImGui.TextWrapped("这些时间表会相互影响! 建议选择价值最高的时间表。");
                 ImGui.Spacing();
             
             }
@@ -238,16 +242,16 @@ public class MainWindow : Window, IDisposable
                 {
                     if (day <= Solver.Solver.CurrentDay && endDaySummaries.Count > day)
                     {
-                        if (ImGui.BeginTabItem("Day " + (day + 1)))
+                        if (ImGui.BeginTabItem("生产日 " + (day + 1)))
                         {
                             string title = "Crafted";
                             if (day == Solver.Solver.CurrentDay)
                                 title = "Scheduled";
                             if (endDaySummaries[day].crafts.Count > 0 && ImGui.BeginTable(title, 3))
                             {
-                                ImGui.TableSetupColumn("Product", ImGuiTableColumnFlags.WidthFixed, 180);
-                                ImGui.TableSetupColumn("Qty.", ImGuiTableColumnFlags.WidthFixed, 100);
-                                ImGui.TableSetupColumn("Value", ImGuiTableColumnFlags.WidthFixed, 100);
+                                ImGui.TableSetupColumn("产品", ImGuiTableColumnFlags.WidthFixed, 180);
+                                ImGui.TableSetupColumn("数量", ImGuiTableColumnFlags.WidthFixed, 100);
+                                ImGui.TableSetupColumn("金额", ImGuiTableColumnFlags.WidthFixed, 100);
                                 ImGui.TableHeadersRow();
 
 
@@ -267,9 +271,9 @@ public class MainWindow : Window, IDisposable
                                 ImGui.Spacing();
 
 
-                                ImGui.Text("This day's value: " + endDaySummaries[day].endingGross);
+                                ImGui.Text("金额: " + endDaySummaries[day].endingGross);
                                 ImGui.SameLine(200);
-                                ImGui.Text("Used material value: " + (endDaySummaries[day].endingGross - endDaySummaries[day].endingNet));
+                                ImGui.Text("使用: " + (endDaySummaries[day].endingGross - endDaySummaries[day].endingNet));
                             }
                             else if (endDaySummaries[day].endingGross > 0)
                             {
@@ -286,9 +290,9 @@ public class MainWindow : Window, IDisposable
                             else
                             {
                                 if(day==Solver.Solver.CurrentDay)
-                                    ImGui.Text("Resting");
+                                    ImGui.Text("休息中");
                                 else
-                                    ImGui.Text("Rested");
+                                    ImGui.Text("已休息");
 
                                 if(day > 0 && config.allowOverwritingDays)
                                 {
@@ -296,11 +300,11 @@ public class MainWindow : Window, IDisposable
                                     ImGui.Text("Is this wrong? Please enter your value and groove for the day");
                                     ImGui.PushItemWidth(200);
                                     ImGui.Spacing();
-                                    ImGui.InputInt("Total cowries", ref makeupValue);
+                                    ImGui.InputInt("金额", ref makeupValue);
                                     ImGui.Spacing();
-                                    ImGui.InputInt("Groove generated", ref makeupGroove);
+                                    ImGui.InputInt("产生的干劲", ref makeupGroove);
                                     ImGui.Spacing();
-                                    if (ImGui.Button("Save"))
+                                    if (ImGui.Button("保存"))
                                     {
                                         PluginLog.Debug("Adding stub value");
                                         Solver.Solver.AddStubValue(day, makeupGroove, makeupValue);
@@ -316,7 +320,7 @@ public class MainWindow : Window, IDisposable
                     else if (scheduleSuggestions.ContainsKey(day))
                     {
                         var schedule = scheduleSuggestions[day];
-                        if (ImGui.BeginTabItem("Day " + (day + 1)))
+                        if (ImGui.BeginTabItem("生产日 " + (day + 1)))
                         {
                             if (schedule != null)
                             {
@@ -328,17 +332,17 @@ public class MainWindow : Window, IDisposable
                                         ImGui.Spacing();
                                         if(inventory.Count == 0)
                                         {
-                                            ImGui.TextColored(yellow, "Open Isleventory and view all tabs to check materials required against materials you have.");
+                                            ImGui.TextColored(yellow, "打开你的开拓包，并点击所有的标签，确认是否有相应材料");
                                             ImGui.Spacing();
                                             ImGui.TextWrapped(ConvertMatsToString(matsRequired));
                                             if (ImGui.IsItemHovered())
                                             {
-                                                ImGui.SetTooltip("Starred items are rare and come from the Granary, Pasture, or Cropland");
+                                                ImGui.SetTooltip("带星的物品是稀有材料，来自探索、牧场或耕地。");
                                             }
                                         }
                                         else
                                         {
-                                            string matsNeeded = "Materials needed: ";
+                                            string matsNeeded = "所需材料：";
                                             float currentX = ImGui.CalcTextSize(matsNeeded).X;
                                             float availableX = ImGui.GetContentRegionAvail().X;
                                             ImGui.Text(matsNeeded);
@@ -368,7 +372,7 @@ public class MainWindow : Window, IDisposable
 
                                                 ImGui.TextColored(color, matStr);
                                                 if (isRare)
-                                                    tooltip += "Starred items are rare and come from the Granary, Pasture, or Cropland";
+                                                    tooltip += "带星的物品是稀有材料，来自探索、牧场或耕地。";
                                                 if (ImGui.IsItemHovered())
                                                 {
                                                     ImGui.SetTooltip(tooltip);
@@ -381,9 +385,9 @@ public class MainWindow : Window, IDisposable
                                 if (ImGui.BeginTable("Options", 4, ImGuiTableFlags.ScrollY | ImGuiTableFlags.Resizable))
                                 {
                                     /*ImGui.TableSetupColumn("Confirmed", ImGuiTableColumnFlags.WidthStretch);*/
-                                    ImGui.TableSetupColumn("Use?", ImGuiTableColumnFlags.WidthFixed, 50);
-                                    ImGui.TableSetupColumn("Weighted Value", ImGuiTableColumnFlags.WidthFixed, 100);
-                                    ImGui.TableSetupColumn("Products to Make", ImGuiTableColumnFlags.WidthStretch, 250);
+                                    ImGui.TableSetupColumn("使用？", ImGuiTableColumnFlags.WidthFixed, 50);
+                                    ImGui.TableSetupColumn("权重价值", ImGuiTableColumnFlags.WidthFixed, 100);
+                                    ImGui.TableSetupColumn("生产物品", ImGuiTableColumnFlags.WidthStretch, 250);
                                     ImGui.TableHeadersRow();
 
                                     var enumerator = schedule.orderedSuggestions.GetEnumerator();
@@ -429,7 +433,7 @@ public class MainWindow : Window, IDisposable
                 {
                     if (ImGui.BeginTabItem("Day 1 Next Week"))
                     {
-                        ImGui.Text("Always rest Day 1!");
+                        ImGui.Text("第一天总是休息");
                     }
                 }
 
@@ -445,7 +449,7 @@ public class MainWindow : Window, IDisposable
     private string ConvertMatsToString(IOrderedEnumerable<KeyValuePair<Material, int>> orderedDict)
     {
         var matsEnum = orderedDict.GetEnumerator();
-        StringBuilder matsStr = new StringBuilder("Materials needed: ");
+        StringBuilder matsStr = new StringBuilder("所需材料：");
         while (matsEnum.MoveNext())
         {
             matsStr.Append(matsEnum.Current.Value).Append("x ").Append(RareMaterialHelper.GetDisplayName(matsEnum.Current.Key));

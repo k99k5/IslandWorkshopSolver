@@ -29,17 +29,17 @@ public class ConfigWindow : Window, IDisposable
         float itemWidth = ImGui.GetContentRegionAvail().X / 2;
         ImGui.PushItemWidth(itemWidth); 
         
-        if (ImGui.CollapsingHeader("Solver Configuration", ImGuiTreeNodeFlags.DefaultOpen))
+        if (ImGui.CollapsingHeader("求解器设置", ImGuiTreeNodeFlags.DefaultOpen))
         {
             int sugg = Configuration.suggestionsToShow;
-            if (ImGui.InputInt("Suggestions to show", ref sugg))
+            if (ImGui.InputInt("显示方案数量", ref sugg))
             {
                 Configuration.suggestionsToShow = sugg;
                 Configuration.Save();
             }
             ImGui.Spacing();
             float matWeight = Configuration.materialValue;
-            if (ImGui.SliderFloat("Material weight", ref matWeight, 0.0f, 1.0f))
+            if (ImGui.SliderFloat("材料权重", ref matWeight, 0.0f, 1.0f))
             {
                 Configuration.materialValue = matWeight;
                 Configuration.Save();
@@ -53,45 +53,45 @@ public class ConfigWindow : Window, IDisposable
             }
             ImGui.Spacing();
             bool showNet = Configuration.showNetCowries;
-            if (ImGui.Checkbox("Show net cowries", ref showNet))
+            if (ImGui.Checkbox("显示净利润", ref showNet))
             {
                 Configuration.showNetCowries = showNet;
                 Configuration.Save();
             }
             if (ImGui.IsItemHovered())
             {
-                ImGui.SetTooltip("Net cowries is workshop revenue minus the value you would've gotten from exporting rare materials directly");
+                ImGui.SetTooltip("净利润是工坊收入减去你直接出口稀有材料所获得的价值");
             }
             ImGui.Spacing();
             bool checkMats = Configuration.onlySuggestMaterialsOwned;
-            if (ImGui.Checkbox("Must have rare materials", ref checkMats))
+            if (ImGui.Checkbox("必须有稀有材料", ref checkMats))
             {
                 Configuration.onlySuggestMaterialsOwned = checkMats;
                 Configuration.Save();
             }
             if (ImGui.IsItemHovered())
             {
-                ImGui.SetTooltip("Removes all suggested schedules that require more of a rare material than you have in your isleventory");
+                ImGui.SetTooltip("移除所有建议的时间表，这些时间表需要的稀有材料比你的库存中的多。");
             }
         }
         ImGui.Spacing();
         ImGui.Separator();
         ImGui.Spacing();
-        if (ImGui.CollapsingHeader("Island Configuration", ImGuiTreeNodeFlags.DefaultOpen))
+        if (ImGui.CollapsingHeader("无人岛设置", ImGuiTreeNodeFlags.DefaultOpen))
         {
             ImGui.PopItemWidth();
             ImGui.TextWrapped("These should automatically populate from your island sanctuary, but if you want to play around with them, here you go");
             ImGui.Spacing();
             ImGui.PushItemWidth(itemWidth);
             int rank = Configuration.islandRank;
-            if (ImGui.InputInt("Island rank", ref rank))
+            if (ImGui.InputInt("无人岛等级", ref rank))
             {
                 Configuration.islandRank = rank;
                 Configuration.Save();
             }
             ImGui.Spacing();
             int workshops = Configuration.numWorkshops;
-            if (ImGui.InputInt("Number of workshops", ref workshops))
+            if (ImGui.InputInt("开拓工坊数量", ref workshops))
             {
                 Configuration.numWorkshops = workshops;
                 Configuration.Save();
@@ -99,14 +99,14 @@ public class ConfigWindow : Window, IDisposable
             ImGui.Spacing();
             int currentLevel = (Configuration.workshopBonus - 100) / 10;
 
-            if (ImGui.Combo("Workshop level", ref currentLevel, new string[3] { "Workshop I", "Workshop II", "Workshop III" }, 3))
+            if (ImGui.Combo("开拓工坊等级", ref currentLevel, new string[3] { "等级1", "等级2", "等级3" }, 3))
             {
                 Configuration.workshopBonus = currentLevel * 10 + 100;
                 Configuration.Save();
             }
             ImGui.Spacing();
             int groove = Configuration.maxGroove;
-            if (ImGui.InputInt("Max groove", ref groove))
+            if (ImGui.InputInt("总干劲", ref groove))
             {
                 Configuration.maxGroove = groove;
                 Configuration.Save();
@@ -115,11 +115,11 @@ public class ConfigWindow : Window, IDisposable
         ImGui.Spacing();
         ImGui.Separator();
         ImGui.Spacing();
-        if (ImGui.CollapsingHeader("Advanced Configuration"))
+        if (ImGui.CollapsingHeader("高级设置"))
         {
             ImGui.PopItemWidth();
             string flavorText = String.Join(", ", Configuration.flavorText);
-            if (ImGui.InputText("Filtered words", ref flavorText, 1000))
+            if (ImGui.InputText("关键词隐藏列表", ref flavorText, 1000))
             {
                 Configuration.flavorText = flavorText.Split(",");
                 for (int i = 0; i < Configuration.flavorText.Length; i++)
@@ -128,7 +128,7 @@ public class ConfigWindow : Window, IDisposable
             }
             if (ImGui.IsItemHovered())
             {
-                ImGui.SetTooltip("A list of extra words, separated by commas, to ignore when displaying the names of items.");
+                ImGui.SetTooltip("关键词隐藏列表");
             }
             ImGui.PushItemWidth(itemWidth);
             ImGui.Spacing();
@@ -140,7 +140,7 @@ public class ConfigWindow : Window, IDisposable
             }
             if (ImGui.IsItemHovered())
             {
-                ImGui.SetTooltip("Force you to rest one and only one day (other than day 1).");
+                ImGui.SetTooltip("强制在每周的第一个生产日休息");
             }
             if (Configuration.day == 0 && Configuration.unknownD2Items != null && Configuration.unknownD2Items.Count > 0)
             {
@@ -161,14 +161,14 @@ public class ConfigWindow : Window, IDisposable
             }
             ImGui.Spacing();
             bool allowOverwrite = Configuration.allowOverwritingDays;
-            if (ImGui.Checkbox("Allow overwriting days", ref allowOverwrite))
+            if (ImGui.Checkbox("允许重写天数", ref allowOverwrite))
             {
                 Configuration.allowOverwritingDays = allowOverwrite;
                 Configuration.Save();
             }
             if (ImGui.IsItemHovered())
             {
-                ImGui.SetTooltip("Lets you change rest days to crafted days by inputting their values\nThis is a temporary feature until I get a more user-friendly one");
+                ImGui.SetTooltip("让你通过输入值将休息日改为手工制作日，这是一个临时功能，直到我得到一个更方便的功能。");
             }
         }
     }
